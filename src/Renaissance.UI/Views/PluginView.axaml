@@ -1,0 +1,106 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="using:Renaissance.UI.Controls"
+             x:Class="Renaissance.UI.Views.PluginView">
+  <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+    <!-- Plugin header -->
+    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrushSoft}"
+            BorderThickness="0,0,0,1" Padding="24,16">
+      <Grid ColumnDefinitions="Auto,*"
+      ColumnSpacing="10">
+
+    <Image Grid.Column="0"
+           Source="avares://Renaissance/Assets/logo.png"
+           Width="30"
+           Height="30"
+           VerticalAlignment="Top"
+           Margin="0,4,0,0"/>
+
+    <StackPanel Grid.Column="1"
+                Spacing="2">
+
+        <TextBlock Text="{Binding Title}"
+                   Classes="title"/>
+
+        <TextBlock Text="{Binding Subtitle}"
+                   Classes="muted"/>
+
+    </StackPanel>
+
+</Grid>
+    </Border>
+
+    <!-- Toolbar -->
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="24,14" ColumnSpacing="10">
+      <Button Grid.Column="0" Content="←  Plugins" Command="{Binding BackCommand}" />
+
+      <Button Grid.Column="1" x:Name="PatchButton" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+              ToolTip.Tip="Choose a plugin program or Renaissance preset">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Text="{Binding PatchName}" TextTrimming="CharacterEllipsis" />
+          <TextBlock Grid.Column="1" Text="▾" Classes="muted" />
+        </Grid>
+        <Button.Flyout>
+          <Flyout Placement="BottomEdgeAlignedLeft">
+            <StackPanel Width="400" Spacing="8">
+              <TextBox x:Name="PatchSearch" Text="{Binding PatchFilter}" Watermark="Search patches…" />
+              <ListBox x:Name="PatchList" ItemsSource="{Binding FilteredPatches}" MaxHeight="380" Background="Transparent">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="1" Text="{Binding Group}" Classes="muted" FontSize="11" Margin="12,0,0,0"
+                                 VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </StackPanel>
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+
+      <Button Grid.Column="2" Content="Actions  ▾">
+        <Button.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedRight">
+            <MenuItem Header="Save" Command="{Binding SaveCommand}" />
+            <MenuItem Header="Save As…" Command="{Binding SaveAsCommand}" />
+            <MenuItem Header="Load…" Command="{Binding LoadCommand}" />
+            <MenuItem Header="Rename…" Command="{Binding RenameCommand}" />
+            <MenuItem Header="Delete" Command="{Binding DeleteCommand}" />
+            <Separator />
+            <MenuItem Header="Import FXP…" Command="{Binding ImportFxpCommand}" />
+            <MenuItem Header="Export FXP…" Command="{Binding ExportFxpCommand}" />
+            <Separator />
+            <MenuItem Header="Import FXB…" Command="{Binding ImportFxbCommand}" />
+            <MenuItem Header="Export FXB…" Command="{Binding ExportFxbCommand}" />
+          </MenuFlyout>
+        </Button.Flyout>
+      </Button>
+
+      <Button Grid.Column="3" Content="Params" Command="{Binding ShowParamsCommand}" />
+      <Button Grid.Column="4" Content="Unload" Classes="danger" Command="{Binding UnloadCommand}" />
+    </Grid>
+
+    <!-- Status banner -->
+    <Border Grid.Row="2" IsVisible="{Binding Banner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+            Background="#2B2A1B" BorderBrush="#5A5427" BorderThickness="0,1" Padding="24,8">
+      <TextBlock Text="{Binding Banner}" Foreground="#F5D76E" TextWrapping="Wrap" />
+    </Border>
+
+    <!-- Original plugin editor -->
+    <Border Grid.Row="3" Margin="24,0,24,24" Classes="card" ClipToBounds="True">
+      <Grid>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="{Binding EditorWidth}" Height="{Binding EditorHeight}" IsVisible="{Binding HasEditor}">
+          <ctl:PluginEditorHost x:Name="EditorHost" />
+        </Border>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6" IsVisible="{Binding HasNoEditor}">
+          <TextBlock Text="This plugin has no editor of its own." HorizontalAlignment="Center" />
+          <TextBlock Text="Use Params to edit its parameters." Classes="muted" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

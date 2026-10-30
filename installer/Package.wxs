@@ -1,0 +1,60 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Renaissance"
+           Manufacturer="Renaissance"
+           Version="$(ProductVersion)"
+           UpgradeCode="6B1C2F6E-3D0A-4F55-9C7B-2E5A1D4B8F10"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Renaissance is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Property Id="ARPCOMMENTS" Value="Universal VST2/VST3 legacy plugin bridge" />
+
+    <!--
+      Install layout
+        %LOCALAPPDATA%\Renaissance\App                          app + 32/64-bit plugin hosts
+        C:\Program Files\Common Files\VST2                      Renaissance.dll (instrument), Renaissance FX.dll (effect)
+        C:\Program Files\Common Files\VST3\Renaissance.vst3     VST3 bundle (instrument + effect)
+      The plugins find the app in %LOCALAPPDATA%\Renaissance\App automatically.
+    -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="RenaissanceDataFolder" Name="Renaissance">
+        <Directory Id="AppFolder" Name="App" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="CommonFiles64Folder">
+      <Directory Id="Vst2Folder" Name="VST2" />
+      <Directory Id="Vst3Folder" Name="VST3">
+        <Directory Id="Vst3BundleFolder" Name="Renaissance.vst3">
+          <Directory Id="Vst3ContentsFolder" Name="Contents">
+            <Directory Id="Vst3BinaryFolder" Name="x86_64-win" />
+          </Directory>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <ComponentGroup Id="AppFiles" Directory="AppFolder">
+      <Files Include="$(StageDir)\App\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="Vst2Files" Directory="Vst2Folder">
+      <Files Include="$(StageDir)\Vst2\*.dll" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="Vst3Files" Directory="Vst3BinaryFolder">
+      <Files Include="$(StageDir)\Vst3\Renaissance.vst3" />
+    </ComponentGroup>
+
+    <Feature Id="App" Title="Renaissance app and plugin hosts" Level="1" AllowAbsent="no">
+      <ComponentGroupRef Id="AppFiles" />
+    </Feature>
+    <Feature Id="Vst2" Title="VST2 plugins (Renaissance, Renaissance FX)" Level="1">
+      <ComponentGroupRef Id="Vst2Files" />
+    </Feature>
+    <Feature Id="Vst3" Title="VST3 plugin" Level="1">
+      <ComponentGroupRef Id="Vst3Files" />
+    </Feature>
+  </Package>
+</Wix>

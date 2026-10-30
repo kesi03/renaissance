@@ -1,0 +1,53 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the solution
+    cmds:
+      - dotnet build Renaissance.slnx
+
+  test:
+    desc: Run unit and integration tests
+    cmds:
+      - dotnet test
+
+  vst2:
+    desc: Build VST2 plugins
+    cmds:
+      - pwsh ./build-vst2.ps1
+
+  install:
+    desc: Build and install VST2 plugins
+    deps:
+      - vst2
+    cmds:
+      - pwsh ./build-vst2.ps1 -Install "C:\VSTPlugins\Renaissance"
+
+  installer:
+    desc: Build installation package
+    cmds:
+      - pwsh ./build-installer.ps1
+
+  ci:
+    desc: Full CI build
+    cmds:
+      - dotnet build Renaissance.slnx
+      - dotnet test
+      - pwsh ./build-vst2.ps1
+      - pwsh ./build-installer.ps1
+
+  release:
+    desc: Build, test, package, and install locally
+    cmds:
+      - dotnet build Renaissance.slnx
+      - dotnet test
+      - pwsh ./build-vst2.ps1
+      - pwsh ./build-vst2.ps1 -Install "C:\VSTPlugins\Renaissance"
+      - pwsh ./build-installer.ps1
+
+  default:
+    desc: Standard developer build
+    cmds:
+      - task: build
+      - task: test
+      - task: vst2

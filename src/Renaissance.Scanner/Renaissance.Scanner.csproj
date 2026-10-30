@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Renaissance.Core\Renaissance.Core.csproj" />
+    <ProjectReference Include="..\Renaissance.PluginDatabase\Renaissance.PluginDatabase.csproj" />
+  </ItemGroup>
+</Project>

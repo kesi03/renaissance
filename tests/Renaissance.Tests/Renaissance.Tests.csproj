@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Renaissance.Core\Renaissance.Core.csproj" />
+    <ProjectReference Include="..\..\src\Renaissance.PresetEngine\Renaissance.PresetEngine.csproj" />
+    <ProjectReference Include="..\..\src\Renaissance.PluginDatabase\Renaissance.PluginDatabase.csproj" />
+    <ProjectReference Include="..\..\src\Renaissance.Scanner\Renaissance.Scanner.csproj" />
+    <ProjectReference Include="..\..\src\Renaissance.Vst2\Renaissance.Vst2.csproj" />
+    <ProjectReference Include="..\..\src\Renaissance.Vst3\Renaissance.Vst3.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildAndCopyHosts" AfterTargets="Build">
+    <MSBuild Projects="..\..\src\Renaissance.Host64\Renaissance.Host64.csproj" Properties="Configuration=$(Configuration)" />
+    <MSBuild Projects="..\..\src\Renaissance.Host32\Renaissance.Host32.csproj" Properties="Configuration=$(Configuration)" />
+    <ItemGroup>
+      <Host64Files Include="..\..\src\Renaissance.Host64\bin\$(Configuration)\net10.0\win-x64\**\*" />
+      <Host32Files Include="..\..\src\Renaissance.Host32\bin\$(Configuration)\net10.0\win-x86\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(Host64Files)" DestinationFiles="@(Host64Files->'$(OutDir)Hosts\Host64\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Host32Files)" DestinationFiles="@(Host32Files->'$(OutDir)Hosts\Host32\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

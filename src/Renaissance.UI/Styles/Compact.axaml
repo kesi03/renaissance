@@ -1,0 +1,26 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Applied only when Renaissance is embedded in a DAW editor. -->
+  <Style Selector="Button">
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+  <Style Selector="ToggleButton">
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+  <Style Selector="TextBox">
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+  <Style Selector="ComboBox">
+    <Setter Property="Padding" Value="8,3" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+  <Style Selector="TextBlock.title">
+    <Setter Property="FontSize" Value="18" />
+  </Style>
+  <Style Selector="DataGrid">
+    <Setter Property="RowHeight" Value="26" />
+  </Style>
+</Styles>

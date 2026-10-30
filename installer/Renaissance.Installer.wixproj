@@ -1,0 +1,14 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\version.txt').Trim())</ProductVersion>
+    <StageDir Condition="'$(StageDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\stage</StageDir>
+    <OutputName>Renaissance-$(ProductVersion)-x64</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <OutputPath>$(MSBuildThisFileDirectory)..\artifacts\installer\</OutputPath>
+    <IntermediateOutputPath>$(MSBuildThisFileDirectory)obj\</IntermediateOutputPath>
+    <!-- The app lives in the installing user's profile (LocalAppData) while the plugins go to Program Files, so
+         a per-machine package necessarily trips the "files in user profile" validation rules. -->
+    <SuppressIces>ICE38;ICE60;ICE64;ICE91</SuppressIces>
+    <DefineConstants>$(DefineConstants);ProductVersion=$(ProductVersion);StageDir=$(StageDir)</DefineConstants>
+  </PropertyGroup>
+</Project>

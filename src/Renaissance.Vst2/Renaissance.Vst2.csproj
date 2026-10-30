@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Native VST2 plugin DLL (x64). Published with NativeAOT so it exports VSTPluginMain like any C++ plugin.
+       build-vst2.ps1 copies the result to "Renaissance.dll" (instrument) and "Renaissance FX.dll" (effect). -->
+  <PropertyGroup>
+    <AssemblyName>Renaissance.Vst2</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SelfContained>true</SelfContained>
+    <StripSymbols>true</StripSymbols>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <NoWarn>$(NoWarn);IL2026;IL3050;IL2104;IL3053</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Renaissance.Core\Renaissance.Core.csproj" />
+  </ItemGroup>
+</Project>

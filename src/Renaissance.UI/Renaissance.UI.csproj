@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>Renaissance</AssemblyName>
+    <RootNamespace>Renaissance.UI</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.13" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Renaissance.Core\Renaissance.Core.csproj" />
+    <ProjectReference Include="..\Renaissance.PresetEngine\Renaissance.PresetEngine.csproj" />
+    <ProjectReference Include="..\Renaissance.PluginDatabase\Renaissance.PluginDatabase.csproj" />
+    <ProjectReference Include="..\Renaissance.Scanner\Renaissance.Scanner.csproj" />
+  </ItemGroup>
+
+  <!-- Build both isolated plugin hosts (explicit runtime identifiers, so a self-contained publish of the app can't
+       leak its own RuntimeIdentifier into the 32-bit host) and place them in Hosts\Host32 / Hosts\Host64. -->
+  <Target Name="BuildHostProjects">
+    <MSBuild Projects="..\Renaissance.Host64\Renaissance.Host64.csproj" Properties="Configuration=$(Configuration);RuntimeIdentifier=win-x64;SelfContained=true" />
+    <MSBuild Projects="..\Renaissance.Host32\Renaissance.Host32.csproj" Properties="Configuration=$(Configuration);RuntimeIdentifier=win-x86;SelfContained=true" />
+    <ItemGroup>
+      <Host64Files Include="..\Renaissance.Host64\bin\$(Configuration)\net10.0\win-x64\**\*" />
+      <Host32Files Include="..\Renaissance.Host32\bin\$(Configuration)\net10.0\win-x86\**\*" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopyHostsToOutput" AfterTargets="Build" DependsOnTargets="BuildHostProjects">
+    <Copy SourceFiles="@(Host64Files)" DestinationFiles="@(Host64Files->'$(OutDir)Hosts\Host64\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Host32Files)" DestinationFiles="@(Host32Files->'$(OutDir)Hosts\Host32\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyHostsToPublish" AfterTargets="Publish" DependsOnTargets="BuildHostProjects">
+    <Copy SourceFiles="@(Host64Files)" DestinationFiles="@(Host64Files->'$(PublishDir)Hosts\Host64\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Host32Files)" DestinationFiles="@(Host32Files->'$(PublishDir)Hosts\Host32\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

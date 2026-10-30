@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Renaissance.UI.ViewModels"
+        xmlns:views="using:Renaissance.UI.Views"
+        x:Class="Renaissance.UI.Views.MainWindow"
+        Title="Renaissance"
+        Width="1240" Height="800" MinWidth="960" MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+  <ContentControl Content="{Binding Current}">
+    <ContentControl.DataTemplates>
+      <DataTemplate DataType="vm:ScanViewModel">
+        <views:ScanView />
+      </DataTemplate>
+      <DataTemplate DataType="vm:PluginViewModel">
+        <views:PluginView />
+      </DataTemplate>
+    </ContentControl.DataTemplates>
+  </ContentControl>
+</Window>

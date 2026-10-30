@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 32-bit twin of Renaissance.Host64. Shares all source so behaviour is identical. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Renaissance.Host32</AssemblyName>
+    <RootNamespace>Renaissance.Host</RootNamespace>
+    <PlatformTarget>x86</PlatformTarget>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <ApplicationManifest>..\Renaissance.Host64\app.manifest</ApplicationManifest>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Renaissance.Host64\**\*.cs" Exclude="..\Renaissance.Host64\obj\**;..\Renaissance.Host64\bin\**" LinkBase="." />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Renaissance.Core\Renaissance.Core.csproj" />
+  </ItemGroup>
+</Project>
