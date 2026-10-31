@@ -9,15 +9,25 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of Renaissance is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
-    <Property Id="ARPCOMMENTS" Value="Universal VST2/VST3 legacy plugin bridge" />
+    <Property Id="ARPCOMMENTS" Value="Universal VST2/VST3/CLAP legacy plugin bridge" />
 
     <!--
       Install layout
-        %LOCALAPPDATA%\Renaissance\App                          app + 32/64-bit plugin hosts
-        C:\Program Files\Common Files\VST2                      Renaissance.dll (instrument), Renaissance FX.dll (effect)
-        C:\Program Files\Common Files\VST3\Renaissance.vst3     VST3 bundle (instrument + effect)
+
+        %LOCALAPPDATA%\Renaissance\App
+          app + 32/64-bit plugin hosts
+
+        C:\Program Files\Common Files\VST2
+          Renaissance.dll
+          Renaissance FX.dll
+
+        C:\Program Files\Common Files\VST3\Renaissance.vst3
+
+        C:\Program Files\Common Files\CLAP\Renaissance.clap
+
       The plugins find the app in %LOCALAPPDATA%\Renaissance\App automatically.
     -->
+
     <StandardDirectory Id="LocalAppDataFolder">
       <Directory Id="RenaissanceDataFolder" Name="Renaissance">
         <Directory Id="AppFolder" Name="App" />
@@ -25,7 +35,9 @@
     </StandardDirectory>
 
     <StandardDirectory Id="CommonFiles64Folder">
+
       <Directory Id="Vst2Folder" Name="VST2" />
+
       <Directory Id="Vst3Folder" Name="VST3">
         <Directory Id="Vst3BundleFolder" Name="Renaissance.vst3">
           <Directory Id="Vst3ContentsFolder" Name="Contents">
@@ -33,6 +45,9 @@
           </Directory>
         </Directory>
       </Directory>
+
+      <Directory Id="ClapFolder" Name="CLAP" />
+
     </StandardDirectory>
 
     <ComponentGroup Id="AppFiles" Directory="AppFolder">
@@ -47,14 +62,34 @@
       <Files Include="$(StageDir)\Vst3\Renaissance.vst3" />
     </ComponentGroup>
 
-    <Feature Id="App" Title="Renaissance app and plugin hosts" Level="1" AllowAbsent="no">
+    <ComponentGroup Id="ClapFiles" Directory="ClapFolder">
+      <Files Include="$(StageDir)\Clap\Renaissance.clap" />
+    </ComponentGroup>
+
+    <Feature Id="App"
+             Title="Renaissance app and plugin hosts"
+             Level="1"
+             AllowAbsent="no">
       <ComponentGroupRef Id="AppFiles" />
     </Feature>
-    <Feature Id="Vst2" Title="VST2 plugins (Renaissance, Renaissance FX)" Level="1">
+
+    <Feature Id="Vst2"
+             Title="VST2 plugins (Renaissance, Renaissance FX)"
+             Level="1">
       <ComponentGroupRef Id="Vst2Files" />
     </Feature>
-    <Feature Id="Vst3" Title="VST3 plugin" Level="1">
+
+    <Feature Id="Vst3"
+             Title="VST3 plugin"
+             Level="1">
       <ComponentGroupRef Id="Vst3Files" />
     </Feature>
+
+    <Feature Id="Clap"
+             Title="CLAP plugin"
+             Level="1">
+      <ComponentGroupRef Id="ClapFiles" />
+    </Feature>
+
   </Package>
 </Wix>

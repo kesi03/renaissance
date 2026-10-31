@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Renaissance.Clap/Renaissance.Clap.csproj" />
     <Project Path="src/Renaissance.Core/Renaissance.Core.csproj" />
     <Project Path="src/Renaissance.Host32/Renaissance.Host32.csproj" />
     <Project Path="src/Renaissance.Host64/Renaissance.Host64.csproj" />

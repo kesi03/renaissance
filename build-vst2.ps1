@@ -7,6 +7,7 @@
       Renaissance.dll                 VST2 instrument
       Renaissance FX.dll              VST2 effect (same binary; the "FX" suffix in the file name selects effect mode)
       Renaissance.vst3\               VST3 bundle (contains both an instrument class and an effect class)
+      Renaissance.clap                CLAP plugin (contains both an instrument and an effect class)
       App\                            Renaissance.exe + Host32/Host64, launched by the plugins and embedded in the DAW editor
 
 .PARAMETER Install
@@ -16,10 +17,15 @@
   Also install the VST3 bundle to the standard VST3 folder (C:\Program Files\Common Files\VST3). Needs an elevated
   (administrator) PowerShell. The App folder stays where it was built or installed; its location is recorded in
   %LOCALAPPDATA%\Renaissance\app-path.txt so the plugin can find it.
+
+.PARAMETER InstallClap
+  Also install Renaissance.clap to the standard CLAP folder (C:\Program Files\Common Files\CLAP). Needs an elevated
+  (administrator) PowerShell. Like -InstallVst3 it records the App folder in %LOCALAPPDATA%\Renaissance\app-path.txt.
 #>
 param(
     [string]$Install,
-    [switch]$InstallVst3
+    [switch]$InstallVst3,
+    [switch]$InstallClap
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +39,10 @@ if ($LASTEXITCODE) { throw 'VST2 publish failed' }
 Write-Host '== Publishing native VST3 module (NativeAOT) ==' -ForegroundColor Cyan
 dotnet publish "$root\src\Renaissance.Vst3" -c Release
 if ($LASTEXITCODE) { throw 'VST3 publish failed' }
+
+Write-Host '== Publishing native CLAP plugin (NativeAOT) ==' -ForegroundColor Cyan
+dotnet publish "$root\src\Renaissance.Clap" -c Release
+if ($LASTEXITCODE) { throw 'CLAP publish failed' }
 
 Write-Host '== Building Renaissance app + hosts ==' -ForegroundColor Cyan
 dotnet build "$root\src\Renaissance.UI" -c Release
@@ -57,6 +67,9 @@ $bundleBin = "$out\Renaissance.vst3\Contents\x86_64-win"
 New-Item -ItemType Directory -Path $bundleBin -Force | Out-Null
 Copy-Locked $vst3 "$bundleBin\Renaissance.vst3"
 
+$clap = "$root\src\Renaissance.Clap\bin\Release\net10.0\win-x64\publish\Renaissance.Clap.dll"
+Copy-Locked $clap "$out\Renaissance.clap"
+
 if ($Install) {
     New-Item -ItemType Directory -Path $Install -Force | Out-Null
     Copy-Item "$out\*" $Install -Recurse -Force
@@ -72,6 +85,17 @@ if ($InstallVst3) {
     New-Item -ItemType Directory -Path $configDir -Force | Out-Null
     Set-Content -Path (Join-Path $configDir 'app-path.txt') -Value (Join-Path $appRoot 'App\Renaissance.exe')
     Write-Host "VST3 installed to $vst3Folder" -ForegroundColor Green
+}
+
+if ($InstallClap) {
+    $appRoot = if ($Install) { $Install } else { $out }
+    $clapFolder = Join-Path $env:CommonProgramFiles 'CLAP'
+    New-Item -ItemType Directory -Path $clapFolder -Force | Out-Null
+    Copy-Item "$out\Renaissance.clap" $clapFolder -Force
+    $configDir = Join-Path $env:LOCALAPPDATA 'Renaissance'
+    New-Item -ItemType Directory -Path $configDir -Force | Out-Null
+    Set-Content -Path (Join-Path $configDir 'app-path.txt') -Value (Join-Path $appRoot 'App\Renaissance.exe')
+    Write-Host "CLAP installed to $clapFolder" -ForegroundColor Green
 }
 
 Write-Host "Done: $out" -ForegroundColor Green

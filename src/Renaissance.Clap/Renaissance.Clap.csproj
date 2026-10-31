@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Native CLAP plugin (x64), published with NativeAOT. build-vst2.ps1 copies the result to
+       "Renaissance.clap". CLAP requires an exported data symbol named "clap_entry"; NativeAOT can
+       only export functions, so clap_entry.c provides the struct and forwards to the managed
+       entry points in Exports.cs. The shim is compiled here and linked into the same DLL. -->
+  <PropertyGroup>
+    <AssemblyName>Renaissance.Clap</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SelfContained>true</SelfContained>
+    <StripSymbols>true</StripSymbols>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <NoWarn>$(NoWarn);IL2026;IL3050;IL2104;IL3053</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Renaissance.Core\Renaissance.Core.csproj" />
+  </ItemGroup>
+
+  <!-- SetupOSSpecificProps turns @(NativeLibrary) into @(LinkerArg) before LinkNative runs, so the
+       shim object has to be registered first. -->
+  <Target Name="RegisterClapEntryShim" BeforeTargets="SetupOSSpecificProps">
+    <PropertyGroup>
+      <ClapShimObject>$(NativeIntermediateOutputPath)clap_entry.obj</ClapShimObject>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(_ClapShimRegistered)' != 'true'">
+      <NativeLibrary Include="$(ClapShimObject)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_ClapShimRegistered>true</_ClapShimRegistered>
+    </PropertyGroup>
+  </Target>
+
+  <!-- Compiles clap_entry.c with the MSVC compiler that ships next to the NativeAOT linker.
+       $(CppLinker) is set by SetupOSSpecificProps, so it is available by the time this runs. -->
+  <Target Name="BuildClapEntryShim"
+          DependsOnTargets="SetupOSSpecificProps"
+          BeforeTargets="LinkNative"
+          Inputs="$(MSBuildProjectDirectory)\clap_entry.c"
+          Outputs="$(NativeIntermediateOutputPath)clap_entry.obj">
+    <PropertyGroup>
+      <ClapShimSource>$(MSBuildProjectDirectory)\clap_entry.c</ClapShimSource>
+      <ClapShimObject>$(NativeIntermediateOutputPath)clap_entry.obj</ClapShimObject>
+
+      <!-- $(CppLinker) is either a full path to link.exe or just "link" when the tools are already on PATH. -->
+      <ClapCompiler>cl.exe</ClapCompiler>
+      <ClapCompiler Condition="$(CppLinker.EndsWith('link.exe'))">$(CppLinker.Replace('link.exe', 'cl.exe'))</ClapCompiler>
+    </PropertyGroup>
+
+    <Error Condition="'$(ClapCompiler)' != 'cl.exe' and !Exists('$(ClapCompiler)')"
+           Text="cl.exe was not found next to '$(CppLinker)'. Install the 'Desktop development with C++' workload." />
+
+    <MakeDir Directories="$(NativeIntermediateOutputPath)" />
+
+    <Exec Command="&quot;$(ClapCompiler)&quot; /nologo /c /TC /O2 /GS- /Zl /Fo&quot;$(ClapShimObject)&quot; &quot;$(ClapShimSource)&quot;" />
+  </Target>
+</Project>
