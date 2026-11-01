@@ -16,7 +16,16 @@
 
   Installing needs administrator rights (Program Files).
   Close your DAW before installing or upgrading.
+
+.PARAMETER WixOnly
+  Skips all dotnet publish and staging steps, running only the WiX compilation phase against existing staged files.
 #>
+
+# Accept the new -WixOnly parameter switch
+param (
+    [Parameter(Mandatory = $false)]
+    [switch]$WixOnly
+)
 
 $ErrorActionPreference = 'Stop'
 
@@ -26,69 +35,83 @@ $stage = Join-Path $root 'artifacts\stage'
 $version = (Get-Content "$root\version.txt" -Raw).Trim()
 Write-Host "Renaissance $version" -ForegroundColor Cyan
 
-if (Test-Path $stage)
+# --- SKIP CODE COMPILATION AND STAGING SECTIONS IF -WixOnly IS SPECIFIED ---
+if ($WixOnly)
 {
-    Remove-Item $stage -Recurse -Force
+    Write-Host 'Skipping compilation steps. Running WiX build only...' -ForegroundColor Yellow
+    if (-not (Test-Path $stage))
+    {
+        throw "Staging directory not found at '$stage'. You must run the full build at least once before using -WixOnly."
+    }
+}
+else
+{
+    if (Test-Path $stage)
+    {
+        Remove-Item $stage -Recurse -Force
+    }
+
+    New-Item -ItemType Directory -Path `
+        "$stage\Vst2", `
+        "$stage\Vst3", `
+        "$stage\Clap", `
+        "$stage\App" | Out-Null
+
+    Write-Host '== VST2 plugin (NativeAOT) ==' -ForegroundColor Cyan
+
+    dotnet publish "$root\src\Renaissance.Vst2" -c Release
+
+    if ($LASTEXITCODE)
+    {
+        throw 'VST2 publish failed'
+    }
+
+    $vst2 = "$root\src\Renaissance.Vst2\bin\Release\net10.0\win-x64\publish\Renaissance.Vst2.dll"
+
+    Copy-Item $vst2 "$stage\Vst2\Renaissance.dll"
+    Copy-Item $vst2 "$stage\Vst2\Renaissance FX.dll"
+
+    Write-Host '== VST3 plugin (NativeAOT) ==' -ForegroundColor Cyan
+
+    dotnet publish "$root\src\Renaissance.Vst3" -c Release
+
+    if ($LASTEXITCODE)
+    {
+        throw 'VST3 publish failed'
+    }
+
+    # Note: Ensure your local VST3 NativeAOT generation places directory structures correctly here if Vst3 is a directory bundle
+    Copy-Item `
+        "$root\src\Renaissance.Vst3\bin\Release\net10.0\win-x64\publish\Renaissance.Vst3.dll" `
+        "$stage\Vst3\Renaissance.vst3"
+
+    Write-Host '== CLAP plugin ==' -ForegroundColor Cyan
+
+    $clap = "$root\artifacts\Renaissance-VST2\Renaissance.clap"
+
+    if (-not (Test-Path $clap))
+    {
+        throw "CLAP plugin not found: $clap"
+    }
+
+    Copy-Item $clap "$stage\Clap\Renaissance.clap"
+
+    Write-Host '== App + hosts (self-contained) ==' -ForegroundColor Cyan
+
+    dotnet publish `
+        "$root\src\Renaissance.UI" `
+        -c Release `
+        -r win-x64 `
+        --self-contained true `
+        -o "$stage\App"
+
+    if ($LASTEXITCODE)
+    {
+        throw 'App publish failed'
+    }
 }
 
-New-Item -ItemType Directory -Path `
-    "$stage\Vst2", `
-    "$stage\Vst3", `
-    "$stage\Clap", `
-    "$stage\App" | Out-Null
-
-Write-Host '== VST2 plugin (NativeAOT) ==' -ForegroundColor Cyan
-
-dotnet publish "$root\src\Renaissance.Vst2" -c Release
-
-if ($LASTEXITCODE)
-{
-    throw 'VST2 publish failed'
-}
-
-$vst2 = "$root\src\Renaissance.Vst2\bin\Release\net10.0\win-x64\publish\Renaissance.Vst2.dll"
-
-Copy-Item $vst2 "$stage\Vst2\Renaissance.dll"
-Copy-Item $vst2 "$stage\Vst2\Renaissance FX.dll"
-
-Write-Host '== VST3 plugin (NativeAOT) ==' -ForegroundColor Cyan
-
-dotnet publish "$root\src\Renaissance.Vst3" -c Release
-
-if ($LASTEXITCODE)
-{
-    throw 'VST3 publish failed'
-}
-
-Copy-Item `
-    "$root\src\Renaissance.Vst3\bin\Release\net10.0\win-x64\publish\Renaissance.Vst3.dll" `
-    "$stage\Vst3\Renaissance.vst3"
-
-Write-Host '== CLAP plugin ==' -ForegroundColor Cyan
-
-$clap = "$root\artifacts\Renaissance-VST2\Renaissance.clap"
-
-if (-not (Test-Path $clap))
-{
-    throw "CLAP plugin not found: $clap"
-}
-
-Copy-Item $clap "$stage\Clap\Renaissance.clap"
-
-Write-Host '== App + hosts (self-contained) ==' -ForegroundColor Cyan
-
-dotnet publish `
-    "$root\src\Renaissance.UI" `
-    -c Release `
-    -r win-x64 `
-    --self-contained true `
-    -o "$stage\App"
-
-if ($LASTEXITCODE)
-{
-    throw 'App publish failed'
-}
-
+# --- ENSURE STAGED ARTIFACT INTEGRITY PRE-BUILD ---
 foreach ($required in @(
     'Renaissance.exe',
     'Hosts\Host32\Renaissance.Host32.exe',
@@ -106,6 +129,8 @@ if (-not (Test-Path "$stage\Clap\Renaissance.clap"))
     throw 'CLAP staging failed'
 }
 
+
+# --- RUN WIX 4 MSI BUILD BUILD ---
 Write-Host '== MSI (WiX) ==' -ForegroundColor Cyan
 
 dotnet build `

@@ -1,0 +1,32 @@
+Renaissance License
+
+Copyright (c) 2026 Renaissance
+
+Permission is granted to install and use this software subject to the
+following conditions:
+
+1. Renaissance is provided "as is" without warranty of any kind.
+
+2. The authors are not responsible for loss of data, business
+   interruption, plugin failures, system instability, or any damages
+   resulting from use of the software.
+
+3. Renaissance may load, scan, bridge, host, or interact with
+   third-party audio plugins. The authors do not guarantee the
+   compatibility, stability, legality, licensing, or behaviour of any
+   third-party software.
+
+4. Users are responsible for ensuring they have valid licences for all
+   third-party plugins and content used with Renaissance.
+
+5. The software may store configuration data, scan information, plugin
+   metadata, presets, and user preferences on the local machine.
+
+6. The software must not be used in life-critical, medical, military,
+   aviation, nuclear, or other safety-critical environments.
+
+7. All rights to the Renaissance software remain with its authors unless
+   explicitly stated otherwise.
+
+By installing or using Renaissance, you acknowledge and agree to these
+terms.

@@ -51,3 +51,19 @@ tasks:
       - task: build
       - task: test
       - task: vst2
+
+  preview:
+    desc: Preview build without installation
+    cmds:
+      - dotnet run --project src/Renaissance.UI
+
+  preview:compact:
+    desc: Preview build without installation
+    cmds:
+      - dotnet run --project src/Renaissance.UI -- --compact
+
+  create:mpx:
+    desc: Create MPX package
+    cmds:
+      - pwsh ./build-installer.ps1 -WixOnly
+

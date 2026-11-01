@@ -4,6 +4,7 @@
     <Project Path="src/Renaissance.Core/Renaissance.Core.csproj" />
     <Project Path="src/Renaissance.Host32/Renaissance.Host32.csproj" />
     <Project Path="src/Renaissance.Host64/Renaissance.Host64.csproj" />
+    <Project Path="src/Renaissance.Mixer/Renaissance.Mixer.csproj" />
     <Project Path="src/Renaissance.PluginDatabase/Renaissance.PluginDatabase.csproj" />
     <Project Path="src/Renaissance.PresetEngine/Renaissance.PresetEngine.csproj" />
     <Project Path="src/Renaissance.Scanner/Renaissance.Scanner.csproj" />

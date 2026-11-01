@@ -15,6 +15,7 @@ public sealed partial class ScanViewModel : ObservableObject
     private readonly List<PluginRowViewModel> _all = [];
     private CancellationTokenSource? _cts;
 
+    [ObservableProperty] private bool _showFoldersPanel = false;
     [ObservableProperty] private string _newFolderText = "";
     [ObservableProperty] private string? _selectedFolder;
     [ObservableProperty] private bool _testEditors = true;
@@ -23,7 +24,7 @@ public sealed partial class ScanViewModel : ObservableObject
     [ObservableProperty] private string _selectedCategory = PluginCategories.All;
     [ObservableProperty] private bool _failedOnly;
     [ObservableProperty] private bool _isScanning;
-    [ObservableProperty] private string _statusText = "Add a plugin folder, then press Scan.";
+    [ObservableProperty] private string _statusText = "Press Scan to start.";
     [ObservableProperty] private double _progressValue;
     [ObservableProperty] private double _progressMax = 1;
     [ObservableProperty] private PluginRowViewModel? _selectedPlugin;

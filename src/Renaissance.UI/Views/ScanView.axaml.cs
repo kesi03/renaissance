@@ -19,4 +19,5 @@ public partial class ScanView : UserControl
             && v.FindAncestorOfType<DataGridRow>() is not null)
             vm.OpenPluginCommand.Execute(vm.SelectedPlugin);
     }
+    
 }
