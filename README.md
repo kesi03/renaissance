@@ -1,5 +1,7 @@
 # Renaissance
 
+![Logo](docs/screenshots/top.png)
+
 > Universal VST2/VST3 legacy plugin bridge
 
 Host legacy 32-bit and 64-bit VST2 plugins inside modern DAWs with:
