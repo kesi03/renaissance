@@ -19,7 +19,7 @@ Host legacy 32-bit and 64-bit VST2 plugins inside modern DAWs with:
 
 ## Screenshot Gallery
 
-> Replace these placeholder images as development progresses.
+> Functionality
 
 ### Main Plugin Window
 
