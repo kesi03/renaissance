@@ -95,3 +95,7 @@ docs/
 - Reason 10
 - Reason 14
 - Morning Daw
+
+# Thanks to 
+- https://github.com/Elrinth/YeOldeVST (For inspiration and great code examples)
+- https://github.com/obiwanjacobi/vst.net (For great code and examples)
